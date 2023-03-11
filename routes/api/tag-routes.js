@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     }
     res.status(200).json(tagData);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 
@@ -33,20 +33,61 @@ router.get('/:id', async (req, res) => {
     }
     res.status(200).json(tagID);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 
-router.post('/', (req, res) => {
-  // create a new tag
+router.post('/', async (req, res) => {
+  try {
+    // create a new tag
+    const addTagData = await Tag.create(req.body);
+
+    if (!addTagData) {
+      res.status(404).send("Incorrect Data Inputted");
+      return;
+    }
+    res.status(200).json(addTagData);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
+  try {
   // update a tag's name by its `id` value
+  const updateTag = await Tag.update(req.body, {
+    where: {
+      id: req.params.id,
+    },
+  });
+
+  if (!updateTag) {
+    res.status(404).send("Incorrect ID Inputted");
+    return;
+  }
+  res.status(200).json(updateTag);
+  
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
+  try {
   // delete on tag by its `id` value
+  const deletedTag = await Tag.destroy({
+    where: {
+      id: req.params.id
+    },
+  });
+  if (!deletedTag) {
+    res.status(404).send("No Tag With Inputted ID");
+    return;
+  }
+  res.status(200).json(deletedTag)
+  } catch (err) {  
+    res.status(400).json(err)
+  }
 });
 
 module.exports = router;
